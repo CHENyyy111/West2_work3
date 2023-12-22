@@ -1,22 +1,18 @@
 package com.chenyyy111.dao;
 
-import com.chenyyy111.dao.OrderMapper;
-import com.chenyyy111.dao.ProductMapper;
 import com.chenyyy111.pojo.Order;
 import com.chenyyy111.pojo.Product;
 import com.chenyyy111.utils.MybatisUtils;
-import com.sun.org.apache.bcel.internal.generic.NEW;
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.session.SqlSession;
 import org.junit.Test;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
 public class OrderManageTest {
+    ///检验商品类
+    //查询所有商品
     @Test
     public void testGetProductsList(){
         SqlSession sqlSession = MybatisUtils.getSqlSession();
@@ -27,6 +23,8 @@ public class OrderManageTest {
         }
         sqlSession.close();
     }
+
+    //以商品价格的升序形式查询所有商品
     @Test
     public void testGetProductsListByPriceAsc(){
         SqlSession sqlSession = MybatisUtils.getSqlSession();
@@ -37,6 +35,8 @@ public class OrderManageTest {
         }
         sqlSession.close();
     }
+
+    //通过商品编号查询商品
     @Test
     public void testGetProductById(){
         SqlSession sqlSession = MybatisUtils.getSqlSession();
@@ -45,6 +45,8 @@ public class OrderManageTest {
         System.out.println(productById);
         sqlSession.close();
     }
+
+    //添加一个商品
     @Test
     public void testAddProduct(){
         SqlSession sqlSession = MybatisUtils.getSqlSession();
@@ -61,6 +63,8 @@ public class OrderManageTest {
             sqlSession.close();
         }
     }
+
+    //修改商品
     @Test
     public void testUpdateProduct(){
         SqlSession sqlSession = MybatisUtils.getSqlSession();
@@ -74,6 +78,8 @@ public class OrderManageTest {
         sqlSession.commit();
         sqlSession.close();
     }
+
+    //通过商品编号删除商品
     @Test
     public void testDeleteProduct(){
         SqlSession sqlSession = MybatisUtils.getSqlSession();
@@ -99,7 +105,8 @@ public class OrderManageTest {
 
 
 
-
+    ///检验订单类
+    //查询所有订单
     @Test
     public void testGetOrderList() {
         SqlSession sqlSession = MybatisUtils.getSqlSession();
@@ -110,6 +117,8 @@ public class OrderManageTest {
         }
         sqlSession.close();
     }
+
+    //以订单时间的升序形式查询所有订单
     @Test
     public void testGetOrderListByTimeAsc() {
         SqlSession sqlSession = MybatisUtils.getSqlSession();
@@ -120,6 +129,8 @@ public class OrderManageTest {
         }
         sqlSession.close();
     }
+
+    //以订单价格的升序形式查询所有订单
     @Test
     public void testGetOrderListByPriceAsc() {
         SqlSession sqlSession = MybatisUtils.getSqlSession();
@@ -130,6 +141,8 @@ public class OrderManageTest {
         }
         sqlSession.close();
     }
+
+    //通过订单号查询订单
     @Test
     public void testGetOrderById() {
         SqlSession sqlSession = MybatisUtils.getSqlSession();
@@ -138,6 +151,8 @@ public class OrderManageTest {
         System.out.println(orderById);
         sqlSession.close();
     }
+
+    //修改订单信息
     @Test
     public void testUpdateOrder(){
         SqlSession sqlSession = MybatisUtils.getSqlSession();
@@ -152,13 +167,14 @@ public class OrderManageTest {
                 System.out.println("修改成功！");
             }
         }catch (Exception e){
-            //删除失败，即order表中该数据对应null，即该订单没有商品，订单不成立，删除
             System.out.println("修改失败！");
         }finally {
             sqlSession.commit();
             sqlSession.close();
         }
     }
+
+    //删除订单信息
     @Test
     public void testDeleteOrder(){
         SqlSession sqlSession = MybatisUtils.getSqlSession();
@@ -174,24 +190,28 @@ public class OrderManageTest {
     }
 
 
+    //添加订单和商品的关系
+    //添加关系后需要手动更新
     @Test
     public void testAddOrderProduct(){
         SqlSession sqlSession = MybatisUtils.getSqlSession();
         OrderMapper orderMapper = sqlSession.getMapper(OrderMapper.class);
 
         //创建订单和商品对象
-        Order order = new Order(5, LocalDateTime.now(), 0.0);
+        Order order = orderMapper.getOrderById(4);
         ProductMapper productMapper = sqlSession.getMapper(ProductMapper.class);
-        Product product = productMapper.getProductById(1);
-        System.out.println(order);
-        System.out.println(product);
+        Product product = productMapper.getProductById(2);
+        if(order == null){
+            //订单编号在数据库不存在
+            order = new Order(4, LocalDateTime.now(), 0);
+            orderMapper.addOrder(order);
+        }
 
         //添加商品到订单的商品列表
         order.setProducts(Arrays.asList(product));
 
         //插入订单
         order.calculateOrderPrice();
-        orderMapper.addOrder(order);
 
         //获取订单和商品的ID
         int orderId = order.getOrderId();
@@ -204,7 +224,7 @@ public class OrderManageTest {
         sqlSession.close();
     }
 
-
+    //插入订单
     @Test
     public void testAddOrder() {
         SqlSession sqlSession = MybatisUtils.getSqlSession();
@@ -221,7 +241,5 @@ public class OrderManageTest {
             sqlSession.close();
         }
     }
-
-
 
 }

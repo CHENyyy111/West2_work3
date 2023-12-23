@@ -52,7 +52,7 @@ public class OrderManageTest {
         SqlSession sqlSession = MybatisUtils.getSqlSession();
         try{
             ProductMapper productMapper = sqlSession.getMapper(ProductMapper.class);
-            int i = productMapper.addProduct(new Product(3, "CCC", 6));
+            int i = productMapper.addProduct(new Product(4, "DDD", 6));
             if(i > 0){
                 System.out.println("插入成功！");
             }
@@ -69,7 +69,7 @@ public class OrderManageTest {
     public void testUpdateProduct(){
         SqlSession sqlSession = MybatisUtils.getSqlSession();
         ProductMapper productMapper = sqlSession.getMapper(ProductMapper.class);
-        int i = productMapper.updateProduct(new Product(3,"DDD", 2));
+        int i = productMapper.updateProduct(new Product(1,"aaa", 1));
         if(i > 0){
             System.out.println("修改成功！");
         }else {
@@ -82,9 +82,10 @@ public class OrderManageTest {
     //通过商品编号删除商品
     @Test
     public void testDeleteProduct(){
+        /* 删除商品4 */
         SqlSession sqlSession = MybatisUtils.getSqlSession();
         ProductMapper productMapper = sqlSession.getMapper(ProductMapper.class);
-        int i = productMapper.deleteProduct(1);
+        int i = productMapper.deleteProduct(4);
         if(i > 0){
             System.out.println("删除成功！");
         }else {
@@ -148,16 +149,20 @@ public class OrderManageTest {
         SqlSession sqlSession = MybatisUtils.getSqlSession();
         OrderMapper orderMapper = sqlSession.getMapper(OrderMapper.class);
         Order orderById = orderMapper.getOrderById(1);
-        System.out.println(orderById);
+        if(orderById == null){
+            System.out.println("该订单不存在！");
+        }else {
+            System.out.println(orderById);
+        }
         sqlSession.close();
     }
 
-    //修改订单信息
+    //修改订单信息(更新价格、商品名称)
     @Test
     public void testUpdateOrder(){
         SqlSession sqlSession = MybatisUtils.getSqlSession();
         OrderMapper orderMapper = sqlSession.getMapper(OrderMapper.class);
-        Order order = orderMapper.getOrderById(4);
+        Order order = orderMapper.getOrderById(1);
         try{
             List<Product> productsList = order.getProducts();
             order.setProducts(productsList);
@@ -198,12 +203,12 @@ public class OrderManageTest {
         OrderMapper orderMapper = sqlSession.getMapper(OrderMapper.class);
 
         //创建订单和商品对象
-        Order order = orderMapper.getOrderById(4);
+        Order order = orderMapper.getOrderById(1);
         ProductMapper productMapper = sqlSession.getMapper(ProductMapper.class);
-        Product product = productMapper.getProductById(2);
+        Product product = productMapper.getProductById(3);
         if(order == null){
             //订单编号在数据库不存在
-            order = new Order(4, LocalDateTime.now(), 0);
+            order = new Order(1, LocalDateTime.now(), 0);
             orderMapper.addOrder(order);
         }
 
